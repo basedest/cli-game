@@ -61,6 +61,9 @@ func (h *CommandHandler) HandleCommand(command string) string {
 	case "рестарт":
 		return h.gameUseCase.Restart()
 		
+	case "помощь":
+		return "список команд показан"
+		
 	default:
 		return "неизвестная команда"
 	}
