@@ -1,6 +1,6 @@
 package repository
 
-import "../entity"
+import "github.com/basedest/cli-game/domain/entity"
 
 // GameRepository defines methods for accessing game state
 type GameRepository interface {
@@ -14,4 +14,7 @@ type GameRepository interface {
 	
 	// World initialization
 	InitializeWorld()
+	
+	// For tests - completely resets the game state
+	ResetGame()
 } 

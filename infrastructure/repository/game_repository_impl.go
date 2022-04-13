@@ -1,8 +1,8 @@
 package repository
 
 import (
-	"../../domain/entity"
-	"../../domain/repository"
+	"github.com/basedest/cli-game/domain/entity"
+	"github.com/basedest/cli-game/domain/repository"
 )
 
 // gameRepositoryImpl implements the GameRepository interface
@@ -13,10 +13,13 @@ type gameRepositoryImpl struct {
 
 // NewGameRepository creates a new game repository
 func NewGameRepository() repository.GameRepository {
-	return &gameRepositoryImpl{
+	repo := &gameRepositoryImpl{
 		rooms:  make(map[string]*entity.Room),
 		player: &entity.Player{},
 	}
+	// Initialize the world immediately to ensure consistent state
+	repo.InitializeWorld()
+	return repo
 }
 
 // GetRoom returns a room by name
@@ -45,6 +48,11 @@ func (g *gameRepositoryImpl) ResetPlayer() {
 
 // InitializeWorld initializes the game world
 func (g *gameRepositoryImpl) InitializeWorld() {
+	// Skip if already initialized
+	if len(g.rooms) > 0 && g.player.Location != nil {
+		return
+	}
+
 	// Create rooms
 	kitchen := &entity.Room{Name: "кухня"}
 	corridor := &entity.Room{Name: "коридор"}
@@ -92,4 +100,14 @@ func (g *gameRepositoryImpl) InitializeWorld() {
 	
 	// Street
 	street.Entrances = []*entity.Entrance{{Room: corridor, Door: corridorDoor}}
+}
+
+// ResetGame completely resets the game state for tests
+func (g *gameRepositoryImpl) ResetGame() {
+	// Clear the rooms map
+	g.rooms = make(map[string]*entity.Room)
+	// Reset the player
+	g.player = &entity.Player{}
+	// Reinitialize the world
+	g.InitializeWorld()
 } 

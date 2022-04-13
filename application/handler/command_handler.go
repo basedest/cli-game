@@ -3,7 +3,7 @@ package handler
 import (
 	"strings"
 
-	"../../domain/usecase"
+	"github.com/basedest/cli-game/domain/usecase"
 )
 
 // CommandHandler handles game commands

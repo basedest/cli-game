@@ -1,8 +1,8 @@
 package usecase
 
 import (
-	"../entity"
-	"../repository"
+	"github.com/basedest/cli-game/domain/entity"
+	"github.com/basedest/cli-game/domain/repository"
 )
 
 // GameUseCase defines the game logic operations

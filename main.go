@@ -5,20 +5,24 @@ import (
 	"fmt"
 	"os"
 
-	"./application/handler"
-	"./domain/usecase"
-	"./infrastructure/repository"
+	"github.com/basedest/cli-game/application/handler"
+	domainrepo "github.com/basedest/cli-game/domain/repository"
+	"github.com/basedest/cli-game/domain/usecase"
+	repo "github.com/basedest/cli-game/infrastructure/repository"
+)
+
+// Global variables for test compatibility
+var (
+	gameRepo       domainrepo.GameRepository
+	gameUseCase    usecase.GameUseCase
+	commandHandler *handler.CommandHandler
 )
 
 func main() {
 	fmt.Println("Добро пожаловать в игру \"Очередной день\"!")
 	
 	// Initialize dependencies
-	gameRepo := repository.NewGameRepository()
-	gameRepo.InitializeWorld()
-	
-	gameUseCase := usecase.NewGameUseCase(gameRepo)
-	commandHandler := handler.NewCommandHandler(gameUseCase)
+	initGame()
 	
 	// Start the game loop
 	scanner := bufio.NewScanner(os.Stdin)
@@ -31,17 +35,22 @@ func main() {
 
 // For test compatibility
 func handleCommand(command string) string {
-	// Initialize dependencies for tests
-	gameRepo := repository.NewGameRepository()
-	gameUseCase := usecase.NewGameUseCase(gameRepo)
-	commandHandler := handler.NewCommandHandler(gameUseCase)
-	
+	// Use the existing initialized dependencies
+	if commandHandler == nil {
+		initGame()
+	}
 	return commandHandler.HandleCommand(command)
 }
 
 func initGame() {
-	// This function is required by tests but its functionality
-	// is now in the repository's InitializeWorld method
-	gameRepo := repository.NewGameRepository()
-	gameRepo.InitializeWorld()
+	// Initialize dependencies
+	if gameRepo == nil {
+		gameRepo = repo.NewGameRepository()
+	} else {
+		// For tests - completely reset the game state
+		gameRepo.ResetGame()
+	}
+	
+	gameUseCase = usecase.NewGameUseCase(gameRepo)
+	commandHandler = handler.NewCommandHandler(gameUseCase)
 }
