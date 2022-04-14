@@ -28,6 +28,7 @@ func printHelp() {
 	fmt.Println("  применить [предмет] [цель] - использовать предмет на цели (например, 'применить ключи дверь')")
 	fmt.Println("  рестарт - перезапустить игру")
 	fmt.Println("  помощь - показать доступные команды")
+	fmt.Println("  выход - завершить игру")
 	fmt.Println()
 }
 
@@ -53,6 +54,12 @@ func main() {
 			continue
 		}
 		
+		// Если команда "выход", завершаем игру
+		if command == "выход" {
+			fmt.Println("Спасибо за игру! До свидания!")
+			os.Exit(0)
+		}
+		
 		result := commandHandler.HandleCommand(command)
 		fmt.Println(result)
 	}
@@ -63,11 +70,6 @@ func handleCommand(command string) string {
 	// Use the existing initialized dependencies
 	if commandHandler == nil {
 		initGame()
-	}
-	
-	// Обрабатываем команду помощи отдельно для тестов
-	if command == "помощь" {
-		return "список команд показан"
 	}
 	
 	return commandHandler.HandleCommand(command)

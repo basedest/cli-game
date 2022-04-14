@@ -26,16 +26,17 @@ func FindGoalIndex(array []*GoalData, value string) int {
 
 // GetGoalsString returns a string describing the player's uncompleted goals
 func (p *Player) GetGoalsString() (res string) {
-	res += "надо "
 	var goals []string
 	for _, data := range p.Goals {
 		if !data.Completed {
 			goals = append(goals, data.Goal)
 		}
 	}
+	
 	if len(goals) == 0 {
 		return "ты не знаешь, что дальше делать со своей жизнью"
 	}
-	res += joinStrings(goals, " и ")
+	
+	res = "надо " + joinStrings(goals, " и ")
 	return
 } 

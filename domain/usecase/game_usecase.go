@@ -37,12 +37,29 @@ func (g *gameUseCase) Go(roomName string) (string, error) {
 				return "", entity.NewGameError("дверь закрыта")
 			}
 			player.Location = entrance.Room
+			
+			// Если игрок попал на улицу, отмечаем цель как выполненную
 			if player.Location.Name == "улица" {
 				idx := entity.FindGoalIndex(player.Goals, "идти в универ")
 				if idx != -1 {
 					player.Goals[idx].Completed = true
+					
+					// Проверяем, все ли цели выполнены
+					allGoalsCompleted := true
+					for _, goal := range player.Goals {
+						if !goal.Completed {
+							allGoalsCompleted = false
+							break
+						}
+					}
+					
+					// Если все цели выполнены, выводим торжественное сообщение
+					if allGoalsCompleted {
+						return onGoMessage(player.Location) + "\n🎉 Поздравляем! Вы успешно собрали рюкзак и добрались до университета! Миссия выполнена! 🎉", nil
+					}
 				}
 			}
+			
 			return onGoMessage(player.Location), nil
 		}
 	}
@@ -59,6 +76,11 @@ func (g *gameUseCase) LookAround() string {
 	if player.Location.Name == "кухня" {
 		res += "ты находишься на кухне, "
 	}
+
+	// Special case for street
+	if player.Location.Name == "улица" {
+		res += "ты находишься на улице, "
+	}
 	
 	itemsFound := false
 	for _, object := range player.Location.Objects {
@@ -68,8 +90,8 @@ func (g *gameUseCase) LookAround() string {
 		}
 	}
 	
-	// Special case for empty room that's not kitchen
-	if !itemsFound && player.Location.Name != "кухня" {
+	// Special case for empty room that's not kitchen and street
+	if !itemsFound && player.Location.Name != "кухня" && player.Location.Name != "улица" {
 		res += "пустая комната"
 	} else if itemsFound {
 		// Remove trailing comma and space
@@ -78,7 +100,14 @@ func (g *gameUseCase) LookAround() string {
 	
 	// Add goals except in the room
 	if player.Location.Name != "комната" {
-		res += ", " + player.GetGoalsString()
+		goalsString := player.GetGoalsString()
+		if goalsString != "" {
+			// Добавляем запятую только если есть предыдущий текст и мы добавляем цели
+			if res != "" {
+				res += ", "
+			}
+			res += goalsString
+		}
 	}
 	
 	res += ". можно пройти - " + player.Location.GetEntrancesString()
